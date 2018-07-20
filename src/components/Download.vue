@@ -1,0 +1,181 @@
+<template>
+
+  <!--get public key-->
+  <div>
+    <Form :model="formDownload" :label-width="80">
+
+      <FormItem label="订单Id">
+        <Input v-model="formDownload.orderId" style="width: 300px" ></Input>
+      </FormItem>
+      <FormItem label="私钥">
+        <Input v-model="formDownload.privateKey" placeholder="填写你的私钥..." style="width: 300px" type="textarea" autosize></Input>
+      </FormItem>
+      <a :href="href" :download="fileName">下载</a>
+      <FormItem>
+        <Button type="primary" @click="handleSubmit('formDownload')">生成下载链接</Button>
+        <Button type="ghost" @click="handleReset('formDownload')" style="margin-left: 8px">重置</Button>
+      </FormItem>
+    </Form>
+
+
+
+
+
+  </div>
+
+
+</template>
+<script>/* eslint-disable */
+
+import Buffer from 'buffer'
+import IPFS from "ipfs-api"
+const buffer = Buffer;
+
+const ipfs = new IPFS({host: 'ipfs.infura.io', port: 5001, protocol: 'https'});
+
+import forge from 'node-forge'
+
+export default {
+
+  name: "Download",
+  // 从bookShop传入的值
+  props: [
+    "contract",
+    "account"
+  ],
+  data() {
+    return {
+      formDownload: {
+        orderId: null,
+        privateKey: null,
+      },
+      href: null,
+      fileName: null
+
+    }
+  },
+  created() {
+  },
+  methods: {
+
+
+    // orderId -> goodsHash, aesKey, aesIv
+    // aesKey+privateKey -> aesKey
+    // aesKey+aesIv + ipfs(goodsHash) -> fileOrigin
+    // save to local
+    handleSubmit(name) {
+    var orderId = this.formDownload.orderId;
+    var account = this.account;
+    var privateKey = this.formDownload.privateKey;
+    var goodsHash,aesKey, aesIv;
+    const _this = this;
+
+      this.contract.deployed().then(i => {
+        i.getOrder(orderId, {from: account}).then(res=>{
+          console.log("getOrder", res);
+          goodsHash = res[6];
+          i.getOrder2(orderId, {from: account}).then(res=>{
+            console.log("getOrder2", res);
+            aesKey = res[0]
+            aesIv = res[1]
+
+
+            var privKey = forge.pki.privateKeyFromPem(privateKey);
+            var aesKeyDecrypted = privKey.decrypt(aesKey);
+
+
+            console.log('goodsHash', goodsHash);
+            ipfs.files.get(goodsHash, function (err, files) {
+              console.log('files', files);
+
+              var fileEncrypted = files[0]
+              console.log('bookEncrypted', fileEncrypted);
+              var fileEncryptedContent = fileEncrypted.content;
+              console.log('fileEncryptedContent', fileEncryptedContent);
+
+
+              // decrpt
+              var decipher = forge.cipher.createDecipher('AES-CBC', aesKeyDecrypted);
+              decipher.start({iv: aesIv});
+
+              // node buffer -> forge buffer
+              var fbuffer = forge.util.createBuffer(fileEncryptedContent.toString('binary'))
+              console.log("fbuffer", fbuffer)
+              decipher.update(fbuffer);
+              var result = decipher.finish(); // check 'result' for true/false
+
+              var fileOrigin = decipher.output;
+              console.log("fileOrigin", fileOrigin);
+
+              //transfer fileOrigin
+              var nBuffer = buffer.Buffer(fileOrigin.getBytes(), 'binary');
+              console.log("nBuffer", nBuffer)
+
+              // save file
+              var blob = new Blob([nBuffer], {type: 'application/octet-stream'})
+              _this.href = window.URL.createObjectURL(blob);
+              _this.fileName = "Tobedown.jpg";
+              console.log(_this.href)
+
+              // var debug = {hello: "world"};
+              // var blob = new Blob([JSON.stringify(debug, null, 2)], {type : 'application/json'});
+              // var url = URL.createObjectURL(blob);
+              // _this.href = window.URL.createObjectURL(blob);
+              // console.log(_this.href)
+
+              // var file = new File(["foo"], "foo.txt", {
+              //   type: "text/plain",
+              // });
+
+            })
+
+
+
+          })
+
+        })
+      })
+
+
+
+
+
+
+
+
+
+
+    },
+    handleReset(name) {
+      this.$refs[name].resetFields();
+    },
+
+
+
+
+
+
+  }
+}
+</script>
+
+<style scoped>
+  h1,
+  h2 {
+    font-weight: normal;
+  }
+
+  ul {
+    list-style-type: none;
+    padding: 0;
+  }
+
+  li {
+    display: inline-block;
+    margin: 0 10px;
+  }
+
+  a {
+    color: #42b983;
+  }
+</style>
