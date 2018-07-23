@@ -2,32 +2,16 @@
   <div>
     <!--my buy orders-->
     <div>
-      <div>my buy orders</div>
-      <ul>
-        <li v-for="order in buyOrders">
-          orderId: {{ order.id }} | buyer:{{ order.buyer }} | seller:{{ order.seller }}
-          | price:{{order.price}} | bookindex: {{order.bookIndex}} | closed :{{order.closed}}
-          | goodshash: {{order.goodsHash}}
-        </li>
-      </ul>
-
+      <div>My Buy Orders</div>
+      <Table stripe :columns="myBuyColumns" :data="myBuyData"></Table>
     </div>
 
     <br/>
     <br/>
-    <br/>
 
-    <!--my sell orders-->
     <div>
-      <div>my sell orders</div>
-      <ul>
-        <li v-for="order in sellOrders">
-          orderId: {{ order.id }} | buyer:{{ order.buyer }} | seller:{{ order.seller }}
-          | price:{{order.price}} | bookindex: {{order.bookIndex}} | closed :{{order.closed}}
-          | goodshash: {{order.goodsHash}}
-        </li>
-      </ul>
-
+      <div>My Sell Orders</div>
+      <Table stripe :columns="mySellColumns" :data="mySellData"></Table>
     </div>
 
     <br/>
@@ -52,11 +36,6 @@
       <Button @click="declineOrder()">Decline Buy</Button>
     </div>
 
-
-
-
-
-
   </div>
 
 </template>
@@ -80,8 +59,60 @@
       ],
       data() {
         return {
-          sellOrders: [],
-          buyOrders: [],
+          myBuyColumns: [
+            {
+              title: 'Order Id',
+              key: 'id'
+            },
+            {
+              title: 'Buyer',
+              key: 'buyer'
+            },
+            {
+              title: 'Seller',
+              key: 'buyer'
+            },
+            {
+              title: 'Order Price',
+              key: 'price'
+            },
+            {
+              title: 'Book Index',
+              key: 'bookIndex'
+            },
+            {
+              title: 'Order Finished',
+              key: 'closed'
+            },
+          ],
+          mySellData: [],
+          mySellColumns: [
+            {
+              title: 'Order Id',
+              key: 'id'
+            },
+            {
+              title: 'Buyer',
+              key: 'buyer'
+            },
+            {
+              title: 'Seller',
+              key: 'buyer'
+            },
+            {
+              title: 'Order Price',
+              key: 'price'
+            },
+            {
+              title: 'Book Index',
+              key: 'bookIndex'
+            },
+            {
+              title: 'Order Finished',
+              key: 'closed'
+            },
+          ],
+          myBuyData: [],
 
           approveOrderId: null,
           myPrivateKey: null,
@@ -93,41 +124,6 @@
         this.getUserBuyOrders();
       },
       methods: {
-        getUserSellOrders () {
-          this.contract.deployed().then(i => {
-            i.getUserSellOrders({from: this.account})
-              .then(res => {
-                console.log("getUserSellOrders", res);
-
-                res.forEach(orderId => {
-                  i.getOrder(orderId, {from: this.account}).then(r=>{
-
-                    this.sellOrders.push({
-                      "id": r[0],
-                      "buyer": r[1],
-                      "seller": r[2],
-                      "price": r[3],
-                      "bookIndex": r[4],
-                      "closed": r[5],
-                      "goodsHash": r[6],
-                    })
-
-
-
-                  })
-                })
-
-
-
-              }).catch(e => {
-              console.error(e.message);
-
-
-
-            });
-          })
-        },
-
         getUserBuyOrders () {
           this.contract.deployed().then(i => {
             i.getUserBuyOrders({from: this.account})
@@ -137,33 +133,49 @@
                 res.forEach(orderId => {
                   i.getOrder(orderId, {from: this.account}).then(r=>{
 
-                    this.buyOrders.push({
+                    this.myBuyData.push({
                       "id": r[0],
                       "buyer": r[1],
                       "seller": r[2],
                       "price": r[3],
                       "bookIndex": r[4],
                       "closed": r[5],
-                      "goodsHash": r[6],
                     })
-
-
-
                   })
                 })
 
-
-
               }).catch(e => {
               console.error(e.message);
-
-
 
             });
           })
         },
 
+        getUserSellOrders () {
+          this.contract.deployed().then(i => {
+            i.getUserSellOrders({from: this.account})
+              .then(res => {
+                console.log("getUserSellOrders", res);
 
+                res.forEach(orderId => {
+                  i.getOrder(orderId, {from: this.account}).then(r=>{
+
+                    this.mySellData.push({
+                      "id": r[0],
+                      "buyer": r[1],
+                      "seller": r[2],
+                      "price": r[3],
+                      "bookIndex": r[4],
+                      "closed": r[5],
+                    })
+                  })
+                })
+
+              }).catch(e => {
+              console.error(e.message);
+            });
+          })
+        },
 
 
         // Have: orderId, Private key(UI provided)
@@ -177,7 +189,6 @@
         // encrypt new2 aeskey with buyer's public key -> new2 aeskey encrypted
         // Upload new2 bookEncrypted to ipfs-> IFPS hash
         // Call contract with: IFPS hash, new2 aeskey encrypted, new2 aesIv
-
         approveOrder () {
           myPrivateKey = this.myPrivateKey;
           myApproveorderId = this.approveOrderId;
@@ -194,8 +205,6 @@
                 i.getOrder2(this.approveOrderId, {from: this.account}).then(res2 => {
                   console.log("getOrder2", res2);
                   var buyerPublicKey = res2[2]
-
-
 
 
                   i.getBook(bookId, {from: this.account}).then(res => {
