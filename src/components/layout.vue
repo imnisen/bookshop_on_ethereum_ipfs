@@ -1,25 +1,25 @@
 <template>
   <Tabs value="name1">
 
-    <TabPane label="公钥" name="name1">
+    <TabPane label="Set Key" name="name1">
       <Key :contract="pcontract" :account="paccount"></Key>
     </TabPane>
-    <TabPane label="账户" name="name2">
+    <TabPane label="Account" name="name2">
       <Account :contract="pcontract" :account="paccount"></Account>
     </TabPane>
-    <TabPane label="发布图书" name="name3">
+    <TabPane label="Publish Book" name="name3">
       <Publish :contract="pcontract" :account="paccount"></Publish>
     </TabPane>
-    <TabPane label="所有的书" name="name4">
+    <TabPane label="Book List" name="name4">
       <Books :contract="pcontract" :account="paccount"></Books>
     </TabPane>
-    <TabPane label="购买" name="name5">
+    <TabPane label="Make Order" name="name5">
       <MakeOrder :contract="pcontract" :account="paccount"></MakeOrder>
     </TabPane>
-    <TabPane label="订单" name="name6">
+    <TabPane label="Orders" name="name6">
       <Orders :contract="pcontract" :account="paccount"></Orders>
     </TabPane>
-    <TabPane label="下载" name="name7">
+    <TabPane label="Download" name="name7">
       <Download :contract="pcontract" :account="paccount"></Download>
     </TabPane>
   </Tabs>

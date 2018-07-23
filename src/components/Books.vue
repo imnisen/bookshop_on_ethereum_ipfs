@@ -1,34 +1,20 @@
 <template>
   <div>
-  <div>
-    <div>my books</div>
-    <ul>
-      <li v-for="book in myBooks">
-        Id: {{ book.id }} | Name:{{ book.name }} | Price:{{ book.price }}
-      </li>
-    </ul>
 
-  </div>
+    <div>
+      <div>My Published Books</div>
+      <Table stripe :columns="myBooksColumns" :data="myBooksData"></Table>
+    </div>
 
   <br/>
   <br/>
 
-  <div>
-    <div>All books in system</div>
-    <ul>
-      <li v-for="user in allBooks">
+    <div>
+      <div>All Published Books</div>
+      <Table stripe :columns="allBooksColumns" :data="allBooksData"></Table>
+    </div>
 
-        <div>user: {{user.address}}</div>
-        <ul>
-          <li v-for="book in user.books">
-            Id: {{ book.id }} | Name:{{ book.name }} | Price:{{ book.price }}
-          </li>
-        </ul>
 
-      </li>
-    </ul>
-
-  </div>
   </div>
 </template>
 
@@ -41,8 +27,45 @@
     ],
     data() {
       return {
-        myBooks: [],
-        allBooks: [],
+
+        myBooksColumns: [
+          {
+            title: 'Book Id',
+            key: 'id'
+          },
+          {
+            title: 'Book Name',
+            key: 'name'
+          },
+          {
+            title: 'Book Price',
+            key: 'price'
+          }
+        ],
+        myBooksData: [],
+
+
+        allBooksColumns: [
+          {
+            title: 'Book Id',
+            key: 'id'
+          },
+          {
+            title: 'Book Name',
+            key: 'name'
+          },
+          {
+            title: 'Book Price',
+            key: 'price'
+          },
+          {
+            title: 'Publisher',
+            key: 'publisher'
+          }
+        ],
+        allBooksData: [],
+
+
       }
     },
     created() {
@@ -57,12 +80,11 @@
             // get my books
             i.getUserBooks(this.account, {from: this.account})
               .then(res => {
-                this.myBooks = [];
 
                 res.forEach(bookId => {
                   i.getBook(bookId.toNumber(), {from: this.account})
                     .then(r => {
-                      this.myBooks.push({
+                      this.myBooksData.push({
                         "id": r[0].toNumber(),
                         "name": r[1],
                         "price": r[2].toNumber(),
@@ -78,28 +100,20 @@
 
             // get all books
             i.getUsers({from: this.account}).then(res => {
-              this.allBooks = [];
-
               res.forEach(userAddress => {
-                var userBooks = [];
-
                 i.getUserBooks(userAddress, {from: this.account}).then(bookIds => {
                   bookIds.forEach(id => {
                     i.getBook(id.toNumber(), {from: this.account}).then(r => {
-                      userBooks.push({
+                      this.allBooksData.push({
                         "id": r[0].toNumber(),
                         "name": r[1],
                         "price": r[2].toNumber(),
+                        "publisher": userAddress,
                       })
                     })
                   })
 
 
-                })
-
-                this.allBooks.push({
-                  "address": userAddress,
-                  "books": userBooks,
                 })
 
               })
