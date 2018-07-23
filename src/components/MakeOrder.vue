@@ -2,7 +2,7 @@
   <div>
     <Form ref="formOrder" :model="formOrder" :label-width="80">
 
-      <FormItem label="seller address" prop="address">
+      <FormItem label="Publisher Address" prop="address">
         <Input type="text" v-model="formOrder.address"></Input>
       </FormItem>
       <FormItem label="Book Price" prop="price">
@@ -42,8 +42,6 @@ export default {
     handleOrderSubmit(name) {
       this.makeOrder(this.account, this.formOrder.address,
         this.formOrder.price, this.formOrder.index)
-
-
     },
 
     handleOrderReset(name) {

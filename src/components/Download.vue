@@ -1,25 +1,20 @@
 <template>
 
-  <!--get public key-->
   <div>
     <Form :model="formDownload" :label-width="80">
 
-      <FormItem label="订单Id">
+      <FormItem label="Order Id">
         <Input v-model="formDownload.orderId" style="width: 300px" ></Input>
       </FormItem>
-      <FormItem label="私钥">
-        <Input v-model="formDownload.privateKey" placeholder="填写你的私钥..." style="width: 300px" type="textarea" autosize></Input>
+      <FormItem label="Private Key">
+        <Input v-model="formDownload.privateKey" placeholder="Place your private key..." style="width: 300px" type="textarea" autosize></Input>
       </FormItem>
-      <a :href="href" :download="fileName">下载</a>
+      <a v-if="downLoadLinkShow" :href="href" :download="fileName">Download Link</a>
       <FormItem>
-        <Button type="primary" @click="handleSubmit('formDownload')">生成下载链接</Button>
-        <Button type="ghost" @click="handleReset('formDownload')" style="margin-left: 8px">重置</Button>
+        <Button type="primary" @click="handleSubmit('formDownload')">Generate Download Link</Button>
+        <Button type="ghost" @click="handleReset('formDownload')" style="margin-left: 8px">Reset</Button>
       </FormItem>
     </Form>
-
-
-
-
 
   </div>
 
@@ -50,14 +45,14 @@ export default {
         privateKey: null,
       },
       href: null,
-      fileName: null
+      fileName: null,
+      downLoadLinkShow: false,
 
     }
   },
   created() {
   },
   methods: {
-
 
     // orderId -> goodsHash, aesKey, aesIv
     // aesKey+privateKey -> aesKey
@@ -117,35 +112,15 @@ export default {
               _this.fileName = "Tobedown.jpg";
               console.log(_this.href)
 
-              // var debug = {hello: "world"};
-              // var blob = new Blob([JSON.stringify(debug, null, 2)], {type : 'application/json'});
-              // var url = URL.createObjectURL(blob);
-              // _this.href = window.URL.createObjectURL(blob);
-              // console.log(_this.href)
-
-              // var file = new File(["foo"], "foo.txt", {
-              //   type: "text/plain",
-              // });
-
+              _this.downLoadLinkShow = true;
             })
-
-
-
           })
 
         })
       })
 
-
-
-
-
-
-
-
-
-
     },
+
     handleReset(name) {
       this.$refs[name].resetFields();
     },

@@ -4,24 +4,23 @@
   <div>
     <Form :model="formKey" :label-width="80">
 
-      <FormItem label="我的公钥">
+      <FormItem label="My Public Key">
         <Input v-model="formKey.publicKey" style="width: 300px" readonly type="textarea" autosize></Input>
-        <Button @click="getPublickey()">刷新公钥</Button>
+        <Button @click="getPublickey()">Refresh Public Key</Button>
       </FormItem>
-      <FormItem label="设置公钥">
-        <Input v-model="formKey.value" placeholder="填写你的公钥..." style="width: 300px" type="textarea" autosize></Input>
-        <Button @click="setPublickey()">设置公钥</Button>
+      <FormItem label="Set Public Key">
+        <Input v-model="formKey.value" placeholder="Place your Public Key..." style="width: 300px" type="textarea" autosize></Input>
+        <Button @click="setPublickey()">Set Public Key</Button>
       </FormItem>
 
-      <FormItem label="密钥生成器">
-        <!--<Input v-model="formKey.passPhrase" placeholder="填写初始化种子..."></Input>-->
-        <Button @click="generateKeyPair()">生成公私钥</Button>
+      <FormItem label="Key Pair Generator">
+        <Button @click="generateKeyPair()">Generate Key Pair</Button>
         <p>
-          公钥:
+          Public Key:
         </p>
         <Input v-model="formKey.newPublicKey"  style="width: 300px" type="textarea" autosize></Input>
         <p>
-          私钥（妥善保管）:
+          Private Key（Keep safe）:
         </p>
         <Input v-model="formKey.newPrivateKey" style="width: 300px" type="textarea" autosize></Input>
       </FormItem>

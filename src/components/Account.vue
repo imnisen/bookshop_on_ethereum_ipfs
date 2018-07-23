@@ -2,22 +2,14 @@
 
   <!--get public key-->
   <div>
+    <Form :model="formAccount" :label-width="80">
 
-    <div>
-      <div>我的账户余额： {{balance}}</div>
-      <br/>
-      <br/>
-      <br/>
-      <Button @click="getFakeFund()">获得空投</Button>
-      <br/>
-      <br/>
-      <br/>
-      <Button @click="getBalance()">刷新账户余额</Button>
-
-    </div>
-
-
-
+      <FormItem label="My Balance">
+        <Input v-model="formAccount.balance" style="width: 300px" readonly></Input>
+        <Button @click="getBalance()">Refresh Account</Button>
+        <Button @click="getFakeFund()">Air drop</Button>
+      </FormItem>
+    </Form>
   </div>
 
 
@@ -32,7 +24,9 @@ export default {
   ],
   data() {
     return {
-      balance: null,
+      formAccount: {
+        balance: 0
+      },
     }
   },
   created() {
@@ -44,31 +38,20 @@ export default {
         i.getFakeFund({from: this.account})
           .then(res => {
             console.log(res);
-            this.message = "Transaction done"
-
-
           }).catch(e => {
           console.error(e.message);
-          this.message = "Transaction failed"
-
-
-
         });
       })
     },
 
     getBalance () {
-
       this.contract.deployed().then(i => {
         i.getBalance({from: this.account})
           .then(res => {
             console.log(res);
-            this.balance = res.toNumber()
-
-
+            this.formAccount.balance = res.toNumber()
           }).catch(e => {
           console.error(e.message);
-
         });
       })
     },

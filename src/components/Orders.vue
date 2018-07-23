@@ -21,6 +21,7 @@
     <!--Approve Order-->
 
     <div>
+      <div>Approve Order</div>
       <Input v-model="approveOrderId" placeholder="Place your approveOrderId ..." style="width: 300px"></Input>
       <Input v-model="myPrivateKey" placeholder="Place your Private Key ..." type="textarea" autosize style="width: 300px"></Input>
       <Button @click="approveOrder()">Approve Order</Button>
@@ -32,6 +33,7 @@
 
     <!--declineOrder-->
     <div>
+      <div>Decline Order</div>
       <Input v-model="declineOrderId" placeholder="Place your declineBuyId ..." style="width: 300px"></Input>
       <Button @click="declineOrder()">Decline Buy</Button>
     </div>
