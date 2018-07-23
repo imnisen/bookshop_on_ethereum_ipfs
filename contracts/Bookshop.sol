@@ -103,12 +103,12 @@ contract Bookshop {
     // Logic:
     // 1. Browser call this function with params
     function makeOrder(address buyer, address seller, uint price, uint bookIndex) public returns (uint orderId) {
+      require(price <= account[buyer]);
+      account[buyer] -= price;
       orderId = orders.push(Order(buyer, seller, price, bookIndex, false, "", "", "", publicKeys[buyer])) - 1;
 
       userSellOrders[seller].push(orderId);
       userBuyOrders[buyer].push(orderId);
-
-
 
       // TODO: If something i don't want set, how to do?
         // return true;
@@ -151,11 +151,8 @@ contract Bookshop {
     // 5. Call this function, with orderId, goodsHash
     // 6. send to IPFS
     function approveOrder(uint orderId, string goodsHash, string aesKey, string aesIv) public returns (bool success) {
-        // TODO Need lock account balance first, with other strategy, prevent double pay
 
-        account[orders[orderId].buyer] -= orders[orderId].price;
         account[orders[orderId].seller] += orders[orderId].price;
-
         orders[orderId].goodsHash = goodsHash;
         orders[orderId].closed = true;
         orders[orderId].aesKey = aesKey;
@@ -174,7 +171,8 @@ contract Bookshop {
     // 5. Call this function, with orderId, goodsHash
     // 6. send to IPFS
     function declineOrder(uint orderId) public returns (bool success) {
-        orders[orderId].closed = true;
+      account[orders[orderId].buyer] += orders[orderId].price;
+      orders[orderId].closed = true;
         // o.closed = true;
         return true;
     }
