@@ -3,7 +3,7 @@
   <div>
     <Form ref="formPublish" :model="formPublish" :label-width="80">
 
-      <FormItem label="Select" prop="upload">
+      <FormItem label="Upload" prop="upload">
         <Upload
           :before-upload="handleUpload"
           action="//jsonplaceholder.typicode.com/posts/">
@@ -19,6 +19,11 @@
       </FormItem>
 
       <FormItem>
+        <div style="margin-bottom: 10px">
+          <Spin v-show="showPin"></Spin>
+          <Icon v-show="showDown" type="ios-checkmark" size="20"></Icon>
+          <Icon v-show="showFail" type="ios-close" size="20"></Icon>
+        </div>
         <Button type="primary" @click="handleSubmit('formPublish')">Submit</Button>
         <Button type="ghost" @click="handleReset('formPublish')" style="margin-left: 8px">Reset</Button>
       </FormItem>
@@ -56,7 +61,10 @@ export default {
       loadingStatus: false,
       fileBuffer: null,
       ipfsHash: null,
-      publicKey: null
+      publicKey: null,
+      showPin: false,
+      showDown: false,
+      showFail: false,
     }
   },
   created() {
@@ -85,8 +93,12 @@ export default {
         i.publishBook(this.formPublish.name, ipfsHash, this.formPublish.price, aesKey, aesIv, {from: this.account})
           .then(res => {
             console.log(res);
+            this.showPin = false;
+            this.showDown = true;
           }).catch(e => {
           console.error(e.message);
+          this.showPin = false;
+          this.showFail = true;
         });
       })
     },
@@ -97,17 +109,24 @@ export default {
     handleReset(name) {
       this.$refs[name].resetFields();
       this.file = null;
+
+      this.showPin = false;
+      this.showDown = false;
+      this.showFail = false;
     },
 
     // 上传逻辑
     handleUpload(file) {
       this.file = file;
       console.info(file);
+      this.showDown = false;
+      this.showFail = false;
       return false;
     },
 
     // 上传逻辑
     upload(cb) {
+      this.showPin = true;
       const _this = this;
 
       this.loadingStatus = true;
@@ -144,6 +163,7 @@ export default {
         ipfs.files.add(nodeBuffer, (err, result) => {
           if(err) {
             console.error(err);
+            this.showPin = false;
             return
           }
 
@@ -301,5 +321,10 @@ export default {
 
   a {
     color: #42b983;
+  }
+  .demo-spin-col{
+    height: 100px;
+    position: relative;
+    border: 1px solid #eee;
   }
 </style>
