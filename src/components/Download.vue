@@ -9,8 +9,14 @@
       <FormItem label="Private Key">
         <Input v-model="formDownload.privateKey" placeholder="Place your private key..." style="width: 300px" type="textarea" autosize></Input>
       </FormItem>
-      <a v-if="downLoadLinkShow" :href="href" :download="fileName">Download Link</a>
       <FormItem>
+        <div style="margin-bottom: 10px">
+          <Spin v-show="showPin"></Spin>
+          <Icon v-show="showDown" type="ios-checkmark" size="20"></Icon>
+          <Icon v-show="showFail" type="ios-close" size="20"></Icon>
+          <a v-if="downLoadLinkShow" :href="href" :download="fileName">Download Link</a>
+        </div>
+
         <Button type="primary" @click="handleSubmit('formDownload')">Generate Download Link</Button>
         <Button type="ghost" @click="handleReset('formDownload')" style="margin-left: 8px">Reset</Button>
       </FormItem>
@@ -48,6 +54,9 @@ export default {
       fileName: null,
       downLoadLinkShow: false,
 
+      showPin: false,
+      showDown: false,
+      showFail: false,
     }
   },
   created() {
@@ -60,60 +69,72 @@ export default {
     // aesKey+aesIv + ipfs(goodsHash) -> fileOrigin
     // save to local
     handleSubmit(name) {
+      this.showPin = true;
+      this.showDown = false;
+      this.showFail = false;
+
     var orderId = this.formDownload.orderId;
     var account = this.account;
     var privateKey = this.formDownload.privateKey;
-    var goodsHash,aesKey, aesIv;
+    var goodsHash,aesKey, aesIv, bookIndex, bookName;
     const _this = this;
 
       this.contract.deployed().then(i => {
         i.getOrder(orderId, {from: account}).then(res=>{
           console.log("getOrder", res);
           goodsHash = res[6];
+          bookIndex = res[4];
           i.getOrder2(orderId, {from: account}).then(res=>{
             console.log("getOrder2", res);
             aesKey = res[0]
             aesIv = res[1]
 
+            i.getBook(bookIndex.toNumber(), {from: this.account})
+              .then(r => {
+                bookName = r[1];
 
-            var privKey = forge.pki.privateKeyFromPem(privateKey);
-            var aesKeyDecrypted = privKey.decrypt(aesKey);
-
-
-            console.log('goodsHash', goodsHash);
-            ipfs.files.get(goodsHash, function (err, files) {
-              console.log('files', files);
-
-              var fileEncrypted = files[0]
-              console.log('bookEncrypted', fileEncrypted);
-              var fileEncryptedContent = fileEncrypted.content;
-              console.log('fileEncryptedContent', fileEncryptedContent);
+              var privKey = forge.pki.privateKeyFromPem(privateKey);
+              var aesKeyDecrypted = privKey.decrypt(aesKey);
 
 
-              // decrpt
-              var decipher = forge.cipher.createDecipher('AES-CBC', aesKeyDecrypted);
-              decipher.start({iv: aesIv});
+              console.log('goodsHash', goodsHash);
+              ipfs.files.get(goodsHash, function (err, files) {
+                console.log('files', files);
 
-              // node buffer -> forge buffer
-              var fbuffer = forge.util.createBuffer(fileEncryptedContent.toString('binary'))
-              console.log("fbuffer", fbuffer)
-              decipher.update(fbuffer);
-              var result = decipher.finish(); // check 'result' for true/false
+                var fileEncrypted = files[0]
+                console.log('bookEncrypted', fileEncrypted);
+                var fileEncryptedContent = fileEncrypted.content;
+                console.log('fileEncryptedContent', fileEncryptedContent);
 
-              var fileOrigin = decipher.output;
-              console.log("fileOrigin", fileOrigin);
 
-              //transfer fileOrigin
-              var nBuffer = buffer.Buffer(fileOrigin.getBytes(), 'binary');
-              console.log("nBuffer", nBuffer)
+                // decrpt
+                var decipher = forge.cipher.createDecipher('AES-CBC', aesKeyDecrypted);
+                decipher.start({iv: aesIv});
 
-              // save file
-              var blob = new Blob([nBuffer], {type: 'application/octet-stream'})
-              _this.href = window.URL.createObjectURL(blob);
-              _this.fileName = "Tobedown.jpg";
-              console.log(_this.href)
+                // node buffer -> forge buffer
+                var fbuffer = forge.util.createBuffer(fileEncryptedContent.toString('binary'))
+                console.log("fbuffer", fbuffer)
+                decipher.update(fbuffer);
+                var result = decipher.finish(); // check 'result' for true/false
 
-              _this.downLoadLinkShow = true;
+                var fileOrigin = decipher.output;
+                console.log("fileOrigin", fileOrigin);
+
+                //transfer fileOrigin
+                var nBuffer = buffer.Buffer(fileOrigin.getBytes(), 'binary');
+                console.log("nBuffer", nBuffer)
+
+                // save file
+                var blob = new Blob([nBuffer], {type: 'application/octet-stream'})
+                _this.href = window.URL.createObjectURL(blob);
+                _this.fileName = bookName;
+                console.log(_this.href)
+
+                _this.downLoadLinkShow = true;
+
+                _this.showPin = false;
+                _this.showDown = true;
+              })
             })
           })
 
