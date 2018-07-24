@@ -122,6 +122,7 @@
         }
       },
       created() {
+        console.log("Initial Orders");
         this.getUserSellOrders();
         this.getUserBuyOrders();
       },

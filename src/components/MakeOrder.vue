@@ -37,6 +37,9 @@ export default {
       },
     }
   },
+  created () {
+    console.log("Initial MakeOrder");
+  },
   methods: {
 
     handleOrderSubmit(name) {

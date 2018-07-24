@@ -1,17 +1,16 @@
 <template>
 
   <div>
-    <div>
-      <Upload
-        :before-upload="handleUpload"
-        action="//jsonplaceholder.typicode.com/posts/">
-        <Button type="ghost" icon="ios-cloud-upload-outline">Select the book to upload</Button>
-      </Upload>
-      <div v-if="file !== null">Upload file: {{ file.name }}</div>
-    </div>
-
     <Form ref="formPublish" :model="formPublish" :label-width="80">
 
+      <FormItem label="Select" prop="upload">
+        <Upload
+          :before-upload="handleUpload"
+          action="//jsonplaceholder.typicode.com/posts/">
+          <Button type="ghost" icon="ios-cloud-upload-outline">Which Book</Button>
+        </Upload>
+        <div v-if="file !== null">Upload file: {{ file.name }}</div>
+      </FormItem>
       <FormItem label="Book Name" prop="name">
         <Input type="text" v-model="formPublish.name"></Input>
       </FormItem>
@@ -61,7 +60,8 @@ export default {
     }
   },
   created() {
-    // TODO a bug, this will get no public key since firsrt reload, use has no public key
+    console.log("Initial Publish");
+    // TODO a bug, this will get no public key since first reload, use has no public key
     this.getPublickey()
   },
   methods: {

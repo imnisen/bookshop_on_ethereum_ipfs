@@ -51,6 +51,7 @@ export default {
     }
   },
   created() {
+    console.log("Initial Download");
   },
   methods: {
 

@@ -30,6 +30,7 @@ export default {
     }
   },
   created() {
+    console.log("Initial Account");
     this.getBalance();
   },
   methods: {

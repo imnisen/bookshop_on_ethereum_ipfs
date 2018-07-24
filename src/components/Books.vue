@@ -69,6 +69,7 @@
       }
     },
     created() {
+      console.log("Initial Books");
       this.getBooks()
     },
 

@@ -61,6 +61,7 @@ export default {
     }
   },
   created() {
+    console.log("Initial Key");
     this.getPublickey();
   },
   methods: {
