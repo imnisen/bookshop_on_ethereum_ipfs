@@ -66,10 +66,6 @@ var myApproveorderId;
 
 export default {
   name: "Orders",
-  props: [
-    "contract",
-    "account"
-  ],
   data() {
     return {
       myBuyColumns: [
@@ -142,7 +138,7 @@ export default {
     }
   },
   created() {
-    console.log("Initial Orders");
+    this.account = sessionStorage.getItem("account");
     this.getUserSellOrders();
     this.getUserBuyOrders();
   },

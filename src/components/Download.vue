@@ -40,10 +40,6 @@ export default {
 
   name: "Download",
   // 从bookShop传入的值
-  props: [
-    "contract",
-    "account"
-  ],
   data() {
     return {
       formDownload: {
@@ -60,7 +56,7 @@ export default {
     }
   },
   created() {
-    console.log("Initial Download");
+    this.account = sessionStorage.getItem("account");
   },
   methods: {
 

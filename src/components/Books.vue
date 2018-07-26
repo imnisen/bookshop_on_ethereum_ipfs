@@ -164,10 +164,7 @@ export default {
               }
 
             });
-
             console.log("afterall : userBooks", this.allBooksData)
-
-
           })
 
 
