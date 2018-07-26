@@ -1,13 +1,13 @@
 <template>
 
   <div>
-    <Form ref="formPublish" :model="formPublish" :label-width="80">
+    <Form ref="formPublish" :model="formPublish" :label-width="100">
 
-      <FormItem label="Upload" prop="upload">
+      <FormItem label="Which Book" prop="upload">
         <Upload
           :before-upload="handleUpload"
           action="//jsonplaceholder.typicode.com/posts/">
-          <Button type="ghost" icon="ios-cloud-upload-outline">Which Book</Button>
+          <Button type="ghost" icon="ios-cloud-upload-outline">To Publish</Button>
         </Upload>
         <div v-if="file !== null">Upload file: {{ file.name }}</div>
       </FormItem>
@@ -24,7 +24,7 @@
           <Icon v-show="showDown" type="ios-checkmark" size="20"></Icon>
           <Icon v-show="showFail" type="ios-close" size="20"></Icon>
         </div>
-        <Button type="primary" @click="handleSubmit('formPublish')">Submit</Button>
+        <Button type="primary" @click="handleSubmit('formPublish')">Publish</Button>
         <Button type="ghost" @click="handleReset('formPublish')" style="margin-left: 8px">Reset</Button>
       </FormItem>
     </Form>

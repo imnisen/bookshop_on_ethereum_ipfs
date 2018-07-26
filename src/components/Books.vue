@@ -8,15 +8,15 @@
 
     <div>
       <div>My Published Books</div>
-      <Table stripe :columns="myBooksColumns" :data="myBooksData"></Table>
+      <Table border stripe :columns="myBooksColumns" :data="myBooksData"></Table>
     </div>
 
     <br/>
     <br/>
 
     <div>
-      <div>All Published Books</div>
-      <Table stripe :columns="allBooksColumns" :data="allBooksData"></Table>
+      <div>All Other Published Books</div>
+      <Table border stripe :columns="allBooksColumns" :data="allBooksData"></Table>
     </div>
 
 
@@ -31,7 +31,7 @@ export default {
   components: {Publish},
   props: [
     "contract",
-    "account"
+    "account",
   ],
   data() {
     return {
@@ -102,31 +102,33 @@ export default {
                   })
 
               });
-              console.log("afterall : myBooks", this.myBooks)
+              console.log("afterall : myBooks", this.myBooksData)
             })
 
 
           // get all books
           i.getUsers({from: this.account}).then(res => {
             res.forEach(userAddress => {
-              i.getUserBooks(userAddress, {from: this.account}).then(bookIds => {
-                bookIds.forEach(id => {
-                  i.getBook(id.toNumber(), {from: this.account}).then(r => {
-                    this.allBooksData.push({
-                      "id": r[0].toNumber(),
-                      "name": r[1],
-                      "price": r[2].toNumber(),
-                      "publisher": userAddress,
+              if (userAddress !== this.account) {
+                i.getUserBooks(userAddress, {from: this.account}).then(bookIds => {
+                  bookIds.forEach(id => {
+                    i.getBook(id.toNumber(), {from: this.account}).then(r => {
+                      this.allBooksData.push({
+                        "id": r[0].toNumber(),
+                        "name": r[1],
+                        "price": r[2].toNumber(),
+                        "publisher": userAddress,
+                      })
                     })
                   })
+
+
                 })
+              }
 
+            });
 
-              })
-
-            })
-
-            console.log("afterall : userBooks", this.allBooks)
+            console.log("afterall : userBooks", this.allBooksData)
 
 
           })

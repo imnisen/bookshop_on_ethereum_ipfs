@@ -5,6 +5,10 @@
     <!--Balance-->
     <div>
       <Form :model="formAccount" :label-width="100" label-position="left">
+        <FormItem label="My Address">
+          <Input v-model="this.account" style="width: 300px" readonly autosize></Input>
+        </FormItem>
+
         <FormItem v-if="!showSetKey" label="My Public Key">
           <Input v-model="formAccount.publicKey" style="width: 300px" readonly type="textarea" autosize></Input>
           <Button @click="getPublickey()">Refresh Public Key</Button>
@@ -47,7 +51,7 @@ export default {
   name: "Account",
   props: [
     "contract",
-    "account"
+    "account",
   ],
   data() {
     return {

@@ -29,8 +29,8 @@
 
     </Menu>
     <div id="container">
-      <Account v-if="show=='account'" :contract="pcontract" :account="paccount"></Account>
-      <Books v-if="show=='books'" :contract="pcontract" :account="paccount"></Books>
+      <Account v-if="show=='account'" :contract="pcontract" :account="paccount" ></Account>
+      <Books v-if="show=='books'" :contract="pcontract" :account="paccount" ></Books>
       <MakeOrder v-if="show=='makeorder'" :contract="pcontract" :account="paccount"></MakeOrder>
       <Orders v-if="show=='orders'" :contract="pcontract" :account="paccount"></Orders>
       <Download v-if="show=='download'" :contract="pcontract" :account="paccount"></Download>
@@ -57,6 +57,7 @@ export default {
     return {
       pcontract: null,
       paccount: null,
+      pcontractAddress: null,
       show: 'key',
     }
   },
@@ -95,11 +96,8 @@ export default {
           return instance.address;
         })
         .then(address => {
-          this.contractAddress = address;
         });
     });
-
-
   },
 
   methods: {
