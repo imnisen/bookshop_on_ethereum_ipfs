@@ -3,11 +3,10 @@ import Router from 'vue-router'
 import Layout from '@/components/Layout'
 import Account from '@/components/Account'
 import Books from '@/components/Books'
-import MakeOrder from '@/components/MakeOrder'
 import Orders from '@/components/Orders'
 import Download from '@/components/Download'
 
-Vue.use(Router)
+Vue.use(Router);
 
 export default new Router({
   routes: [
@@ -26,11 +25,6 @@ export default new Router({
           path: '/books',
           name: 'Books',
           component: Books,
-        },
-        {
-          path: '/make-order',
-          name: 'MakeOrder',
-          component: MakeOrder,
         },
         {
           path: '/orders',

@@ -19,6 +19,20 @@
       <Table border stripe :columns="allBooksColumns" :data="allBooksData"></Table>
     </div>
 
+    <div>
+      <Modal
+        v-model="showModal"
+        title="Confirm books to buy"
+        loading
+        @on-ok="ok"
+        @on-cancel="cancel">
+        <p>Id:   {{bookToBuy.id}}</p>
+        <p>Name:   {{bookToBuy.name}}</p>
+        <p>Price:   {{bookToBuy.price}}</p>
+        <p>Publisher:   {{bookToBuy.publisher}}</p>
+      </Modal>
+    </div>
+
 
   </div>
 </template>
@@ -65,10 +79,41 @@ export default {
         {
           title: 'Publisher',
           key: 'publisher'
+        },
+        {
+          title: 'Action',
+          key: 'action',
+          width: 150,
+          align: 'center',
+          render: (h, params) => {
+            return h('div', [
+              h('Button', {
+                props: {
+                  type: 'primary',
+                  size: 'small'
+                },
+                style: {
+                  marginRight: '5px'
+                },
+                on: {
+                  click: () => {
+                    this.createOrder(params.index)
+                  }
+                }
+              }, 'Buy'),
+
+            ]);
+          }
         }
       ],
       allBooksData: [],
-
+      showModal: false,
+      bookToBuy:{
+        id: null,
+        name: null,
+        price: null,
+        publisher: null,
+      },
 
     }
   },
@@ -131,6 +176,39 @@ export default {
           console.error(e.message);
         });
     },
+
+
+    createOrder(index) {
+      this.showModal = true;
+      this.bookToBuy.id = this.allBooksData[index].id;
+      this.bookToBuy.name = this.allBooksData[index].name;
+      this.bookToBuy.price = this.allBooksData[index].price;
+      this.bookToBuy.publisher = this.allBooksData[index].publisher;
+    },
+    ok(){
+      this.makeOrder(this.account, this.bookToBuy.publisher,this.bookToBuy.price, this.bookToBuy.id)
+    },
+    cancel(){
+
+    },
+    makeOrder(buyer, seller, price, bookIndex) {
+      this.contract.deployed().then(i => {
+        i.makeOrder(buyer, seller, price, bookIndex, {from: this.account})
+          .then(res => {
+            console.log(res);
+            this.showModal=false;
+            this.$Message.info('Create order successfully');
+          }).catch(e => {
+          console.error(e.message);
+          this.showModal=false;
+          this.$Message.error('Unable to create order');
+        });
+
+
+
+      })
+    },
+
 
   }
 

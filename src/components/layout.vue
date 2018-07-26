@@ -12,11 +12,6 @@
         Books
       </MenuItem>
 
-      <MenuItem name="make-order">
-        <Icon type="hammer"></Icon>
-        Make Order
-      </MenuItem>
-
       <MenuItem name="orders">
         <Icon type="checkmark"></Icon>
         Orders
