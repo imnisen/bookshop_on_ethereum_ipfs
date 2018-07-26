@@ -2,11 +2,6 @@
   <div>
 
   <Menu mode="horizontal" theme="light" style="margin-bottom: 20px" active-name="key" @on-select="onSelect">
-    <MenuItem name="key">
-      <Icon type="ios-gear"></Icon>
-      Set Key
-    </MenuItem>
-
     <MenuItem name="account">
       <Icon type="person"></Icon>
       Account
@@ -39,7 +34,6 @@
 
   </Menu>
     <div id="container">
-      <Key v-if="show=='key'" :contract="pcontract" :account="paccount"></Key>
       <Account v-if="show=='account'" :contract="pcontract" :account="paccount"></Account>
       <Publish v-if="show=='publish'" :contract="pcontract" :account="paccount"></Publish>
       <Books v-if="show=='books'" :contract="pcontract" :account="paccount"></Books>
@@ -47,31 +41,6 @@
       <Orders v-if="show=='orders'" :contract="pcontract" :account="paccount"></Orders>
       <Download v-if="show=='download'" :contract="pcontract" :account="paccount"></Download>
     </div>
-
-  <!--<Tabs value="keyTab" @on-click="clickKey">-->
-
-    <!--<TabPane label="Set Key" name="keyTab">-->
-      <!--<Key v-if="showKey" :contract="pcontract" :account="paccount"></Key>-->
-    <!--</TabPane>-->
-    <!--<TabPane label="Account" name="accountTab">-->
-      <!--<Account v-if="showAccount" :contract="pcontract" :account="paccount"></Account>-->
-    <!--</TabPane>-->
-    <!--<TabPane label="Publish Book" name="publishTab">-->
-      <!--<Publish v-if="showPublish" :contract="pcontract" :account="paccount"></Publish>-->
-    <!--</TabPane>-->
-    <!--<TabPane label="Book List" name="booksTab">-->
-      <!--<Books v-if="showBooks" :contract="pcontract" :account="paccount"></Books>-->
-    <!--</TabPane>-->
-    <!--<TabPane label="Make Order" name="makeOrderTab">-->
-      <!--<MakeOrder v-if="showMakeOrder" :contract="pcontract" :account="paccount"></MakeOrder>-->
-    <!--</TabPane>-->
-    <!--<TabPane label="Orders" name="ordersTab">-->
-      <!--<Orders v-if="showOrders" :contract="pcontract" :account="paccount"></Orders>-->
-    <!--</TabPane>-->
-    <!--<TabPane label="Download" name="downloadTab">-->
-      <!--<Download v-if="showDownload" :contract="pcontract" :account="paccount"></Download>-->
-    <!--</TabPane>-->
-  <!--</Tabs>-->
   </div>
 </template>
 
@@ -79,7 +48,6 @@
 import Web3 from "web3";
 import contract from "truffle-contract";
 import artifacts from "../../build/contracts/Bookshop.json";
-import Key from './Key'
 import Account from './Account'
 import Publish from './Publish'
 import Books from './Books'
@@ -91,19 +59,12 @@ const BookshopContract = contract(artifacts);
 
 export default {
   name: "layout",
-  components: {Key, Account, Publish, Books, MakeOrder, Orders, Download},
+  components: {Account, Publish, Books, MakeOrder, Orders, Download},
   data() {
     return {
       pcontract: null,
       paccount: null,
       show:'key',
-      // showKey: true,
-      // showAccount: false,
-      // showPublish: false,
-      // showBooks: false,
-      // showMakeOrder: false,
-      // showOrders: false,
-      // showDownload: false,
     }
   },
   created() {
