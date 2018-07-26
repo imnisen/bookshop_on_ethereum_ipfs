@@ -42,15 +42,8 @@ const ipfs = new IPFS({host: 'ipfs.infura.io', port: 5001, protocol: 'https'});
 
 import forge from 'node-forge'
 
-// var publicKey;
-
 export default {
   name: "Publish",
-
-  props: [
-    "contract",
-    "account"
-  ],
   data() {
     return {
       file: null,
@@ -68,8 +61,7 @@ export default {
     }
   },
   created() {
-    console.log("Initial Publish");
-    // TODO a bug, this will get no public key since first reload, use has no public key
+    this.account = sessionStorage.getItem("account");
     this.getPublickey()
   },
   methods: {
@@ -80,6 +72,12 @@ export default {
             console.log(res);
             this.publicKey = res;
             console.log("this.publicKey", this.publicKey)
+
+            if (this.publicKey === "") {
+              console.error("Public key is empty")
+            }
+
+
           }).catch(e => {
           console.error(e.message);
         });
@@ -95,6 +93,9 @@ export default {
             console.log(res);
             this.showPin = false;
             this.showDown = true;
+
+            this.$emit('newBookPublished')
+
           }).catch(e => {
           console.error(e.message);
           this.showPin = false;

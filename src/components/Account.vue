@@ -49,10 +49,6 @@ import forge from 'node-forge'
 
 export default {
   name: "Account",
-  props: [
-    "contract",
-    "account",
-  ],
   data() {
     return {
       showSetKey: false,
@@ -67,7 +63,7 @@ export default {
     }
   },
   created() {
-    console.log("Initial Account");
+    this.account = sessionStorage.getItem("account");
     this.getPublickey();
     this.getBalance();
   },

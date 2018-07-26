@@ -1,7 +1,7 @@
 <template>
   <div>
 
-    <Publish :contract="pcontract" :account="paccount"></Publish>
+    <Publish @newBookPublished="getBooks"></Publish>
 
     <br/>
     <br/>
@@ -29,14 +29,8 @@ import Publish from './Publish'
 export default {
   name: "Books",
   components: {Publish},
-  props: [
-    "contract",
-    "account",
-  ],
   data() {
     return {
-      pcontract: this.contract,
-      paccount: this.account,
 
       myBooksColumns: [
         {
@@ -79,7 +73,7 @@ export default {
     }
   },
   created() {
-    console.log("Initial Books");
+    this.account = sessionStorage.getItem("account");
     this.getBooks()
   },
 
@@ -88,6 +82,7 @@ export default {
       this.contract.deployed()
         .then(i => {
           // get my books
+          console.log(this.account);
           i.getUserBooks(this.account, {from: this.account})
             .then(res => {
 
@@ -104,8 +99,7 @@ export default {
               });
               console.log("afterall : myBooks", this.myBooksData)
             })
-
-
+          console.log('debug');
           // get all books
           i.getUsers({from: this.account}).then(res => {
             res.forEach(userAddress => {
@@ -121,8 +115,6 @@ export default {
                       })
                     })
                   })
-
-
                 })
               }
 
@@ -137,7 +129,6 @@ export default {
         })
         .catch(e => {
           console.error(e.message);
-          this.message = "Transaction failed"
         });
     },
 
