@@ -1,41 +1,35 @@
 <template>
   <div>
 
-  <Menu mode="horizontal" theme="light" style="margin-bottom: 20px" active-name="key" @on-select="onSelect">
-    <MenuItem name="account">
-      <Icon type="person"></Icon>
-      Account
-    </MenuItem>
+    <Menu mode="horizontal" theme="light" style="margin-bottom: 20px" active-name="account" @on-select="onSelect">
+      <MenuItem name="account">
+        <Icon type="person"></Icon>
+        Account
+      </MenuItem>
 
-    <MenuItem name="publish">
-      <Icon type="ios-book"></Icon>
-      Publish Book
-    </MenuItem>
+      <MenuItem name="books">
+        <Icon type="ios-book"></Icon>
+        Books
+      </MenuItem>
 
-    <MenuItem name="books">
-      <Icon type="ios-list"></Icon>
-      Book List
-    </MenuItem>
+      <MenuItem name="makeorder">
+        <Icon type="hammer"></Icon>
+        Make Order
+      </MenuItem>
 
-    <MenuItem name="makeorder">
-      <Icon type="hammer"></Icon>
-      Make Order
-    </MenuItem>
+      <MenuItem name="orders">
+        <Icon type="checkmark"></Icon>
+        Orders
+      </MenuItem>
 
-    <MenuItem name="orders">
-      <Icon type="checkmark"></Icon>
-      Orders
-    </MenuItem>
+      <MenuItem name="download">
+        <Icon type="ios-download"></Icon>
+        Download
+      </MenuItem>
 
-    <MenuItem name="download">
-      <Icon type="ios-download"></Icon>
-      Download
-    </MenuItem>
-
-  </Menu>
+    </Menu>
     <div id="container">
       <Account v-if="show=='account'" :contract="pcontract" :account="paccount"></Account>
-      <Publish v-if="show=='publish'" :contract="pcontract" :account="paccount"></Publish>
       <Books v-if="show=='books'" :contract="pcontract" :account="paccount"></Books>
       <MakeOrder v-if="show=='makeorder'" :contract="pcontract" :account="paccount"></MakeOrder>
       <Orders v-if="show=='orders'" :contract="pcontract" :account="paccount"></Orders>
@@ -49,7 +43,6 @@ import Web3 from "web3";
 import contract from "truffle-contract";
 import artifacts from "../../build/contracts/Bookshop.json";
 import Account from './Account'
-import Publish from './Publish'
 import Books from './Books'
 import MakeOrder from './MakeOrder'
 import Orders from './Orders'
@@ -59,12 +52,12 @@ const BookshopContract = contract(artifacts);
 
 export default {
   name: "layout",
-  components: {Account, Publish, Books, MakeOrder, Orders, Download},
+  components: {Account, Books, MakeOrder, Orders, Download},
   data() {
     return {
       pcontract: null,
       paccount: null,
-      show:'key',
+      show: 'key',
     }
   },
   created() {
@@ -110,7 +103,7 @@ export default {
   },
 
   methods: {
-    onSelect (val) {
+    onSelect(val) {
       // this.$router.push(`/${val}`)
       this.show = val;
 

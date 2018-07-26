@@ -1,13 +1,18 @@
 <template>
   <div>
 
+    <Publish :contract="pcontract" :account="paccount"></Publish>
+
+    <br/>
+    <br/>
+
     <div>
       <div>My Published Books</div>
       <Table stripe :columns="myBooksColumns" :data="myBooksData"></Table>
     </div>
 
-  <br/>
-  <br/>
+    <br/>
+    <br/>
 
     <div>
       <div>All Published Books</div>
@@ -19,123 +24,125 @@
 </template>
 
 <script>/* eslint-disable */
-  export default {
-    name: "Books",
-    props: [
-      "contract",
-      "account"
-    ],
-    data() {
-      return {
+import Publish from './Publish'
 
-        myBooksColumns: [
-          {
-            title: 'Book Id',
-            key: 'id'
-          },
-          {
-            title: 'Book Name',
-            key: 'name'
-          },
-          {
-            title: 'Book Price',
-            key: 'price'
-          }
-        ],
-        myBooksData: [],
+export default {
+  name: "Books",
+  components: {Publish},
+  props: [
+    "contract",
+    "account"
+  ],
+  data() {
+    return {
+      pcontract: this.contract,
+      paccount: this.account,
 
-
-        allBooksColumns: [
-          {
-            title: 'Book Id',
-            key: 'id'
-          },
-          {
-            title: 'Book Name',
-            key: 'name'
-          },
-          {
-            title: 'Book Price',
-            key: 'price'
-          },
-          {
-            title: 'Publisher',
-            key: 'publisher'
-          }
-        ],
-        allBooksData: [],
+      myBooksColumns: [
+        {
+          title: 'Book Id',
+          key: 'id'
+        },
+        {
+          title: 'Book Name',
+          key: 'name'
+        },
+        {
+          title: 'Book Price',
+          key: 'price'
+        }
+      ],
+      myBooksData: [],
 
 
-      }
-    },
-    created() {
-      console.log("Initial Books");
-      this.getBooks()
-    },
-
-    methods: {
-      getBooks() {
-        this.contract.deployed()
-          .then(i => {
-
-            // get my books
-            i.getUserBooks(this.account, {from: this.account})
-              .then(res => {
-
-                res.forEach(bookId => {
-                  i.getBook(bookId.toNumber(), {from: this.account})
-                    .then(r => {
-                      this.myBooksData.push({
-                        "id": r[0].toNumber(),
-                        "name": r[1],
-                        "price": r[2].toNumber(),
-                      })
-                    })
-
-                })
-
-                console.log("afterall : myBooks", this.myBooks)
-
-              })
+      allBooksColumns: [
+        {
+          title: 'Book Id',
+          key: 'id'
+        },
+        {
+          title: 'Book Name',
+          key: 'name'
+        },
+        {
+          title: 'Book Price',
+          key: 'price'
+        },
+        {
+          title: 'Publisher',
+          key: 'publisher'
+        }
+      ],
+      allBooksData: [],
 
 
-            // get all books
-            i.getUsers({from: this.account}).then(res => {
-              res.forEach(userAddress => {
-                i.getUserBooks(userAddress, {from: this.account}).then(bookIds => {
-                  bookIds.forEach(id => {
-                    i.getBook(id.toNumber(), {from: this.account}).then(r => {
-                      this.allBooksData.push({
-                        "id": r[0].toNumber(),
-                        "name": r[1],
-                        "price": r[2].toNumber(),
-                        "publisher": userAddress,
-                      })
+    }
+  },
+  created() {
+    console.log("Initial Books");
+    this.getBooks()
+  },
+
+  methods: {
+    getBooks() {
+      this.contract.deployed()
+        .then(i => {
+          // get my books
+          i.getUserBooks(this.account, {from: this.account})
+            .then(res => {
+
+              res.forEach(bookId => {
+                i.getBook(bookId.toNumber(), {from: this.account})
+                  .then(r => {
+                    this.myBooksData.push({
+                      "id": r[0].toNumber(),
+                      "name": r[1],
+                      "price": r[2].toNumber(),
                     })
                   })
 
-
-                })
-
-              })
-
-              console.log("afterall : userBooks", this.allBooks)
-
-
+              });
+              console.log("afterall : myBooks", this.myBooks)
             })
 
 
+          // get all books
+          i.getUsers({from: this.account}).then(res => {
+            res.forEach(userAddress => {
+              i.getUserBooks(userAddress, {from: this.account}).then(bookIds => {
+                bookIds.forEach(id => {
+                  i.getBook(id.toNumber(), {from: this.account}).then(r => {
+                    this.allBooksData.push({
+                      "id": r[0].toNumber(),
+                      "name": r[1],
+                      "price": r[2].toNumber(),
+                      "publisher": userAddress,
+                    })
+                  })
+                })
+
+
+              })
+
+            })
+
+            console.log("afterall : userBooks", this.allBooks)
+
+
           })
-          .catch(e => {
-            console.error(e.message);
-            this.message = "Transaction failed"
-          });
-      },
 
-    }
 
+        })
+        .catch(e => {
+          console.error(e.message);
+          this.message = "Transaction failed"
+        });
+    },
 
   }
+
+
+}
 </script>
 
 <style scoped>
