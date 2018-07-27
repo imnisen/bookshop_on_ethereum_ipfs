@@ -1,6 +1,4 @@
 <template>
-
-
   <div>
     <!--Balance-->
     <div>
@@ -40,8 +38,6 @@
       </Form>
     </div>
   </div>
-
-
 </template>
 
 <script>/* eslint-disable */

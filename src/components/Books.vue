@@ -33,7 +33,6 @@
       </Modal>
     </div>
 
-
   </div>
 </template>
 
@@ -124,6 +123,11 @@ export default {
 
   methods: {
     getBooks() {
+
+      this.myBooksData = []
+      this.allBooksData = []
+
+
       this.contract.deployed()
         .then(i => {
           // get my books
