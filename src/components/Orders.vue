@@ -14,41 +14,6 @@
       <Table stripe :columns="mySellColumns" :data="mySellData"></Table>
     </div>
 
-    <br/>
-    <br/>
-    <br/>
-
-    <!--Approve Order-->
-
-    <!--<div>-->
-    <!--<div>Approve Order</div>-->
-    <!--<Input v-model="approveOrderId" placeholder="Place your approveOrderId ..." style="width: 300px"></Input>-->
-    <!--<Input v-model="myPrivateKey" placeholder="Place your Private Key ..." type="textarea" autosize-->
-    <!--style="width: 300px"></Input>-->
-    <!--<Button @click="approveOrder()">Approve Order</Button>-->
-    <!--<div style="margin-bottom: 10px">-->
-    <!--<Spin v-show="showPin1"></Spin>-->
-    <!--<Icon v-show="showDown1" type="ios-checkmark" size="20"></Icon>-->
-    <!--<Icon v-show="showFail1" type="ios-close" size="20"></Icon>-->
-    <!--</div>-->
-    <!--</div>-->
-
-    <!--<br/>-->
-    <!--<br/>-->
-    <!--<br/>-->
-
-    <!--&lt;!&ndash;declineOrder&ndash;&gt;-->
-    <!--<div>-->
-    <!--<div>Decline Order</div>-->
-    <!--<Input v-model="declineOrderId" placeholder="Place your declineBuyId ..." style="width: 300px"></Input>-->
-    <!--<Button @click="declineOrder()">Decline Buy</Button>-->
-    <!--<div style="margin-bottom: 10px">-->
-    <!--<Spin v-show="showPin2"></Spin>-->
-    <!--<Icon v-show="showDown2" type="ios-checkmark" size="20"></Icon>-->
-    <!--<Icon v-show="showFail2" type="ios-close" size="20"></Icon>-->
-    <!--</div>-->
-    <!--</div>-->
-
   </div>
 
 </template>
@@ -68,6 +33,8 @@ export default {
   name: "Orders",
   data() {
     return {
+      refresh: false,
+      myBuyData: [],
       myBuyColumns: [
         {
           title: 'Order Id',
@@ -90,9 +57,96 @@ export default {
           key: 'bookIndex'
         },
         {
-          title: 'Order Finished',
+          title: 'Order Closed',
           key: 'closed'
         },
+        {
+          title: 'Order Success',
+          key: 'success'
+        },
+
+        {
+          title: 'Action',
+          key: 'action',
+          width: 200,
+          align: 'center',
+          render: (h, params) => {
+
+            if (this.refresh) {
+
+            }
+            if (this.myBuyData[params.index].closed) {
+              if (this.myBuyData[params.index].success) {
+
+                console.log("bbb", this.myBuyData[params.index].showDownloadLink)
+                if (this.myBuyData[params.index].showDownloadLink) {
+                  return h('a', {
+                    attrs: {
+                      href: this.myBuyData[params.index].href,
+                      download: this.myBuyData[params.index].download
+                    }
+                  }, "Download")
+                } else {
+
+                  return h('div', [
+                    h('Button', {
+                      props: {
+                        type: 'primary',
+                        size: 'small'
+                      },
+                      style: {
+                        marginRight: '5px'
+                      },
+                      on: {
+                        click: () => {
+
+                          this.$Modal.confirm({
+                            okText: 'OK',
+                            cancelText: 'Cancel',
+                            loading: true,
+                            render: (h) => {
+                              return h('Input', {
+                                props: {
+                                  value: myPrivateKey,
+                                  autofocus: true,
+                                  placeholder: 'Please enter your private key to confirm order',
+                                  type: "textarea",
+                                  autosize: true,
+                                },
+                                on: {
+                                  input: (val) => {
+                                    myPrivateKey = val;
+                                  },
+                                }
+                              })
+                            },
+
+                            onOk: () => {
+                              console.log('myPrivateKey', myPrivateKey)
+                              console.log('params.index', params.index)
+                              console.log('params.index', this.myBuyData[params.index].id)
+                              this.generateDownloadLink(this.myBuyData[params.index].id,
+                                this.account,
+                                myPrivateKey,
+                                params.index
+                              )
+                            }
+                          })
+                        }
+                      }
+                    }, 'Generate Download Link'),
+                  ]);
+                }
+              } else {
+                return h('Icon', {
+                  props: {
+                    type: "close",
+                  }
+                })
+              }
+            }
+          }
+        }
       ],
       mySellData: [],
       mySellColumns: [
@@ -117,8 +171,12 @@ export default {
           key: 'bookIndex'
         },
         {
-          title: 'Order Finished',
+          title: 'Order Closed',
           key: 'closed'
+        },
+        {
+          title: 'Order Success',
+          key: 'success'
         },
         {
           title: 'Action',
@@ -126,10 +184,10 @@ export default {
           width: 200,
           align: 'center',
           render: (h, params) => {
-            console.log("this.mySellData[params.index].closed",this.mySellData[params.index].closed)
+            console.log("this.mySellData[params.index].closed", this.mySellData[params.index].closed)
             if (this.mySellData[params.index].closed) {
               return h('Icon', {
-                props:{
+                props: {
                   type: "checkmark"
                 }
               })
@@ -173,7 +231,7 @@ export default {
                           console.log('params.index', params.index)
                           console.log('params.index', this.mySellData[params.index].id)
 
-                          this.approveOrderId = this.mySellData[params.index].id.toNumber()
+                          this.approveOrderId = this.mySellData[params.index].id
                           this.approveOrder()
                         }
                       })
@@ -198,7 +256,7 @@ export default {
                           console.log('params.index', params.index)
                           console.log('params.index', this.mySellData[params.index].id)
 
-                          this.declineOrderId = this.mySellData[params.index].id.toNumber()
+                          this.declineOrderId = this.mySellData[params.index].id
                           this.declineOrder()
                         }
                       })
@@ -213,19 +271,11 @@ export default {
           }
         }
       ],
-      myBuyData: [],
+
 
       approveOrderId: null,
       myPrivateKey: null,
       declineOrderId: null,
-
-      showPin1: false,
-      showDown1: false,
-      showFail1: false,
-
-      showPin2: false,
-      showDown2: false,
-      showFail2: false,
 
     }
   },
@@ -246,13 +296,18 @@ export default {
             console.log("getUserBuyOrders", res);
             res.forEach(orderId => {
               i.getOrder(orderId, {from: this.account}).then(r => {
-                this.myBuyData.push({
-                  "id": r[0],
-                  "buyer": r[1],
-                  "seller": r[2],
-                  "price": r[3],
-                  "bookIndex": r[4],
-                  "closed": r[5],
+
+                i.getOrder2(orderId, {from: this.account}).then(r2 => {
+
+                  this.myBuyData.push({
+                    "id": r[0].toNumber(),
+                    "buyer": r[1],
+                    "seller": r[2],
+                    "price": r[3].toNumber(),
+                    "bookIndex": r[4].toNumber(),
+                    "closed": r[5],
+                    "success": r2[3],
+                  })
                 })
               })
             })
@@ -271,13 +326,16 @@ export default {
             console.log("getUserSellOrders", res);
             res.forEach(orderId => {
               i.getOrder(orderId, {from: this.account}).then(r => {
-                this.mySellData.push({
-                  "id": r[0],
-                  "buyer": r[1],
-                  "seller": r[2],
-                  "price": r[3],
-                  "bookIndex": r[4],
-                  "closed": r[5],
+                i.getOrder2(orderId, {from: this.account}).then(r2 => {
+                  this.mySellData.push({
+                    "id": r[0].toNumber(),
+                    "buyer": r[1],
+                    "seller": r[2],
+                    "price": r[3].toNumber(),
+                    "bookIndex": r[4].toNumber(),
+                    "closed": r[5],
+                    "success": r2[3],
+                  })
                 })
               })
             })
@@ -305,10 +363,6 @@ export default {
       myApproveorderId = this.approveOrderId;
       var myAccount = this.account
 
-      // this.showPin1 = true;
-      // this.showDown1 = false;
-      // this.showFail1 = false;
-
       const _this = this;
 
       this.contract.deployed().then(i => {
@@ -330,6 +384,8 @@ export default {
                 var aesKey1 = res[3];
                 var aesIv1 = res[4];
 
+                console.log("aesKey1", aesKey1);
+
                 // get from IPFS
                 ipfs.files.get(bookHash, function (err, files) {
 
@@ -342,7 +398,7 @@ export default {
 
                   console.log(myPrivateKey)
                   var sellerPrivateKey = forge.pki.privateKeyFromPem(myPrivateKey);
-                  console.log("aesKey1", aesKey1)
+                  console.log("---aesKey1-----", aesKey1);
                   var aesKeyDecrypted = sellerPrivateKey.decrypt(aesKey1)
 
                   console.log("aesKeyDecrypted", aesKeyDecrypted)
@@ -376,8 +432,6 @@ export default {
                   ipfs.files.add(nodeBuffer, (err, result) => {
                     if (err) {
                       console.error(err);
-                      // _this.showPin1 = false;
-                      // _this.showFail1 = true;
                       return
                     }
 
@@ -390,8 +444,6 @@ export default {
                     i.approveOrder(myApproveorderId, result[0].hash, aesKey2Encrypted, aesIv2, {from: myAccount})
                       .then(res => {
                         console.log("approveOrder res", res)
-                        // _this.showPin1 = false;
-                        // _this.showDown1 = true;
                         _this.$Modal.remove();
                         _this.$Message.info('Approve success');
                         setTimeout(() => {
@@ -402,24 +454,18 @@ export default {
                 })
               }).catch(e => {
                 console.error(e.message);
-                // _this.showPin1 = false;
-                // _this.showFail1 = true;
                 _this.$Modal.remove();
                 _this.$Message.info('Approve failed');
                 _this.getOrders();
               });
             }).catch(e => {
               console.error(e.message);
-              // _this.showPin1 = false;
-              // _this.showFail1 = true;
               _this.$Modal.remove();
               _this.$Message.info('Approve failed');
               _this.getOrders();
             });
           }).catch(e => {
           console.error(e.message);
-          // _this.showPin1 = false;
-          // _this.showFail1 = true;
           _this.$Modal.remove();
           _this.$Message.info('Approve failed');
           _this.getOrders();
@@ -428,16 +474,10 @@ export default {
     },
 
     declineOrder() {
-      // this.showPin2 = true;
-      // this.showDown2 = false;
-      // this.showFail2 = false;
-      // const _this = this;
       this.contract.deployed().then(i => {
         i.declineOrder(this.declineOrderId, {from: this.account})
           .then(res => {
             console.log(res);
-            // _this.showPin2 = false;
-            // _this.showDown2 = true;
 
             this.$Modal.remove();
             this.$Message.info('Decline success');
@@ -445,15 +485,109 @@ export default {
           }).catch(e => {
           console.error(e.message);
 
-          // _this.showPin2 = false;
-          // _this.showFail2 = true;
-
           this.$Modal.remove();
           this.$Message.info('Decline failed');
 
         });
       })
     },
+
+    // Download book
+    generateDownloadLink(orderId, account, privateKey, showLinkIndex) {
+
+      var goodsHash, aesKey, aesIv, bookIndex, bookName;
+      const _this = this;
+      this.contract.deployed().then(i => {
+        i.getOrder(orderId, {from: account}).then(res => {
+          console.log("getOrder", res);
+          goodsHash = res[6];
+          console.log("goodsHash", goodsHash);
+          bookIndex = res[4];
+          i.getOrder2(orderId, {from: account}).then(res => {
+            console.log("getOrder2", res);
+            aesKey = res[0]
+            aesIv = res[1]
+
+            i.getBook(bookIndex.toNumber(), {from: this.account})
+              .then(r => {
+                bookName = r[1];
+
+                console.log("privateKey", privateKey);
+                var privKey = forge.pki.privateKeyFromPem(privateKey);
+                console.log('privateKey2', privKey);
+                console.log('aesKey', aesKey);
+                var aesKeyDecrypted = privKey.decrypt(aesKey);
+                console.log('aesKeyDecrypted', aesKeyDecrypted);
+
+                console.log('goodsHash', goodsHash);
+                ipfs.files.get(goodsHash, function (err, files) {
+                  console.log('files', files);
+
+                  var fileEncrypted = files[0]
+                  console.log('bookEncrypted', fileEncrypted);
+                  var fileEncryptedContent = fileEncrypted.content;
+                  console.log('fileEncryptedContent', fileEncryptedContent);
+
+                  // decrpt
+                  var decipher = forge.cipher.createDecipher('AES-CBC', aesKeyDecrypted);
+                  decipher.start({iv: aesIv});
+
+                  // node buffer -> forge buffer
+                  var fbuffer = forge.util.createBuffer(fileEncryptedContent.toString('binary'))
+                  console.log("fbuffer", fbuffer)
+                  decipher.update(fbuffer);
+                  var result = decipher.finish(); // check 'result' for true/false
+
+                  var fileOrigin = decipher.output;
+                  console.log("fileOrigin", fileOrigin);
+
+                  //transfer fileOrigin
+                  var nBuffer = buffer.Buffer(fileOrigin.getBytes(), 'binary');
+                  console.log("nBuffer", nBuffer)
+
+                  // save file
+                  var blob = new Blob([nBuffer], {type: 'application/octet-stream'})
+                  _this.myBuyData[showLinkIndex].href = window.URL.createObjectURL(blob);
+                  _this.myBuyData[showLinkIndex].download = bookName;
+                  _this.myBuyData[showLinkIndex].showDownloadLink = true;
+
+                  console.log('aaa')
+                  console.log(_this.myBuyData[showLinkIndex].href)
+                  console.log(_this.myBuyData[showLinkIndex].download)
+                  console.log(_this.myBuyData[showLinkIndex].showDownloadLink)
+                  console.log(_this.myBuyData)
+                  _this.refresh = !_this.refresh
+
+                  _this.$Modal.remove();
+                  _this.$Message.info('Generate download link success');
+
+                })
+              })
+            //   .catch(e => {
+            //   console.error(e.message);
+            //   _this.$Modal.remove();
+            //   _this.$Message.info('Generate download link fail');
+            // });
+          })
+          //   .catch(e => {
+          //   console.error(e.message);
+          //   _this.$Modal.remove();
+          //   _this.$Message.info('Generate download link fail');
+          // });
+
+        })
+        //   .catch(e => {
+        //   console.error(e.message);
+        //   _this.$Modal.remove();
+        //   _this.$Message.info('Generate download link fail');
+        // });
+      })
+      //   .catch(e => {
+      //   console.error(e.message);
+      //   _this.$Modal.remove();
+      //   _this.$Message.info('Generate download link fail');
+      // });
+    }
 
   }
 

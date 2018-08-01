@@ -4,7 +4,6 @@ import Layout from '@/components/Layout'
 import Account from '@/components/Account'
 import Books from '@/components/Books'
 import Orders from '@/components/Orders'
-import Download from '@/components/Download'
 
 Vue.use(Router);
 
@@ -30,11 +29,6 @@ export default new Router({
           path: '/orders',
           name: 'Orders',
           component: Orders,
-        },
-        {
-          path: '/download',
-          name: 'Download',
-          component: Download,
         },
       ]
     },

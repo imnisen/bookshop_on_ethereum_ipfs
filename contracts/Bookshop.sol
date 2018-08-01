@@ -26,6 +26,7 @@ contract Bookshop {
     uint price;
     uint bookIndex;
     bool closed;
+    bool success;
     string goodsHash;
     string aesKey;
     string aesIv;
@@ -93,7 +94,7 @@ contract Bookshop {
   function makeOrder(address buyer, address seller, uint price, uint bookIndex) public returns (uint orderId) {
     require(price <= account[buyer]);
     account[buyer] -= price;
-    orderId = orders.push(Order(buyer, seller, price, bookIndex, false, "", "", "", publicKeys[buyer])) - 1;
+    orderId = orders.push(Order(buyer, seller, price, bookIndex, false, false, "", "", "", publicKeys[buyer])) - 1;
 
     userSellOrders[seller].push(orderId);
     userBuyOrders[buyer].push(orderId);
@@ -119,8 +120,8 @@ contract Bookshop {
     );
   }
   // a workround of 'CompilerError: Stack too deep, try removing local variables.'
-  function getOrder2(uint orderId) public view returns (string, string, string) {
-    return (orders[orderId].aesKey, orders[orderId].aesIv, orders[orderId].buyerPublicKey);
+  function getOrder2(uint orderId) public view returns (string, string, string, bool) {
+    return (orders[orderId].aesKey, orders[orderId].aesIv, orders[orderId].buyerPublicKey, orders[orderId].success);
   }
 
   // purpose: Alice argree with the order
@@ -137,6 +138,7 @@ contract Bookshop {
     account[orders[orderId].seller] += orders[orderId].price;
     orders[orderId].goodsHash = goodsHash;
     orders[orderId].closed = true;
+    orders[orderId].success = true;
     orders[orderId].aesKey = aesKey;
     orders[orderId].aesIv = aesIv;
   }
@@ -154,6 +156,7 @@ contract Bookshop {
     require(!orders[orderId].closed);
     account[orders[orderId].buyer] += orders[orderId].price;
     orders[orderId].closed = true;
+    orders[orderId].success = false;
   }
 
 }

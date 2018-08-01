@@ -17,11 +17,6 @@
         Orders
       </MenuItem>
 
-      <MenuItem name="download">
-        <Icon type="ios-download"></Icon>
-        Download
-      </MenuItem>
-
     </Menu>
     <div id="container">
       <router-view></router-view>
